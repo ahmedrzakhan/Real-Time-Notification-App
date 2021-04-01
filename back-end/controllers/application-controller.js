@@ -3,7 +3,10 @@ const User = require("./../Models/User");
 
 const addApplication = async (req, res) => {
   const {
-    assignedTo,
+    assignedToUserId,
+    assignedToUserName,
+    assignedToUserEmail,
+    assignedDepartment,
     createdBy,
     createdDate,
     department,
@@ -12,7 +15,10 @@ const addApplication = async (req, res) => {
   } = req.body;
 
   const application = new Application({
-    assignedTo,
+    assignedDepartment,
+    assignedToUserId,
+    assignedToUserName,
+    assignedToUserEmail,
     createdBy,
     createdDate,
     department,
@@ -29,10 +35,12 @@ const addApplication = async (req, res) => {
 };
 
 const getApplications = async (req, res) => {
-  const { assignedTo, createdBy, status } = req.query;
+  const { createdBy, assignedDepartment, status } = req.query;
 
-  if (assignedTo) {
-    const applications = await Application.find({ assignedTo: assignedTo });
+  if (assignedDepartment) {
+    const applications = await Application.find({
+      assignedDepartment: assignedDepartment,
+    });
     return res.send(applications);
   } else {
     const applications = await Application.find(
@@ -41,7 +49,7 @@ const getApplications = async (req, res) => {
         status: status,
       },
       { createdBy: 0 }
-    );
+    ).limit(5);
     return res.send(applications);
   }
 };
@@ -57,4 +65,55 @@ const getOtherDepartments = async (req, res) => {
   res.send(departments);
 };
 
-module.exports = { addApplication, getApplications, getOtherDepartments };
+const getDepartmentUsers = async (req, res) => {
+  const { department } = req.query;
+
+  const users = await User.find(
+    { department: department },
+    { email: 1, name: 1 }
+  );
+
+  res.send(users);
+};
+
+const updateApplicationStatus = async (req, res) => {
+  const {
+    assignedTo,
+    createdBy,
+    createdDate,
+    department,
+    _id,
+    message,
+    status,
+  } = req.body;
+
+  Application.findById(_id)
+    .then((application) => {
+      (application.assignedTo = assignedTo),
+        (application.createdBy = createdBy),
+        (application.createdDate = createdDate),
+        (application.department = department),
+        (application.message = message),
+        (application.status = status);
+
+      application
+        .save()
+        .then((application) => {
+          res.send(application);
+        })
+        .catch((error) => {
+          console.log("Error in finding application", error);
+        });
+    })
+    .catch((error) => {
+      res.status(400).send("Error in updating application", error);
+    });
+};
+
+module.exports = {
+  addApplication,
+  getApplications,
+  getDepartmentUsers,
+  getOtherDepartments,
+  updateApplicationStatus,
+};

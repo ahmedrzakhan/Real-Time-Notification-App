@@ -46,7 +46,7 @@ const loginUser = async (req, res) => {
 
   if (!validPassword) return res.status(400).send("Invalid Password");
 
-  res.json({ user: user, message: "Logged in Successfully" });
+  res.send(user);
 };
 
 const getDepartments = async (req, res) => {
