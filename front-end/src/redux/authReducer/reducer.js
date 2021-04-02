@@ -10,6 +10,8 @@ import {
   LOGIN_USER_FAILURE,
 } from "./actionTypes";
 
+import { saveData } from "./../store";
+
 const initialState = {
   areDepartmentsLoading: false,
   departments: [],
@@ -26,6 +28,7 @@ export const authReducer = (state = initialState, { type, payload }) => {
     }
 
     case SIGNUP_USER_SUCCESS: {
+      saveData("user", { userData: payload, isLoggedIn: true });
       return { ...state, isRegisterationPending: false, user: payload };
     }
 
@@ -54,6 +57,7 @@ export const authReducer = (state = initialState, { type, payload }) => {
     }
 
     case LOGIN_USER_SUCCESS: {
+      saveData("user", { userData: payload, isLoggedIn: true });
       return {
         ...state,
         isAuthenticating: false,

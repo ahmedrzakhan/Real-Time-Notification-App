@@ -50,7 +50,7 @@ const loginUser = async (req, res) => {
 };
 
 const getDepartments = async (req, res) => {
-  const departments = await User.find({}, { department: 1 });
+  const departments = await User.distinct("department");
   return res.send(departments);
 };
 

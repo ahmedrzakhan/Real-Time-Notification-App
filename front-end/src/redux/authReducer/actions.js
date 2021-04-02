@@ -97,7 +97,7 @@ export const getDepartmentsFailure = (payload) => ({
 });
 
 export const getDepartments = (payload) => async (dispatch) => {
-  dispatch(loginUserRequest(payload));
+  dispatch(getDepartmentsRequest(payload));
 
   const config = {
     method: "get",

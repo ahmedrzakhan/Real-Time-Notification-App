@@ -40,6 +40,7 @@ const getApplications = async (req, res) => {
   if (assignedDepartment) {
     const applications = await Application.find({
       assignedDepartment: assignedDepartment,
+      status: { $ne: "Approved" },
     });
     return res.send(applications);
   } else {
