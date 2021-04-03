@@ -1,21 +1,45 @@
-import React from "react";
+import React, { useMemo, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { updateApplicationStatus } from "./../../redux/applicationsReducer/actions";
 import { theme } from "./../../theme/theme";
 import { loadData } from "./../../redux/store";
+import { io, Manager } from "socket.io-client";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const RenderApplications = ({ applications, actionRequired }) => {
   const dispatch = useDispatch();
   const userId = loadData("user").userData._id;
 
-  const handleActionClick = (e, application) => {
-    // console.log("e", e.target.value);
-    // console.log("application", application);
-    // console.log("application", (application.status = e.target.value));
-    // console.log("application", application);
+  const manager = useMemo(
+    () =>
+      new Manager("ws://localhost:5000", {
+        path: "/notification/sockets",
+        transports: ["websocket"],
+      }),
+    []
+  );
 
+  const socket = manager.socket("/");
+
+  const handleActionClick = (e, application) => {
     application.status = e.target.value;
+
+    socket.emit("sendRequest", {
+      type: "update",
+      payload: application,
+    });
+
+    // socket.on("requestApprovedSuccessfully", (data) => {
+    //   console.log("data", data);
+    //   alert(data.message);
+    // });
+
+    // socket.on("requestRejectedSuccessfully", (data) => {
+    //   console.log("data", data);
+    //   alert(data.message);
+    // });
 
     dispatch(updateApplicationStatus(application));
   };

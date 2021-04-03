@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { loadData } from "./../../redux/store";
@@ -10,6 +10,7 @@ import {
 import { Card, Title } from "./RenderApplications";
 import Select from "./../shared/Select/Select";
 import { theme } from "./../../theme/theme";
+import { io, Manager } from "socket.io-client";
 
 const Form = () => {
   const userData = loadData("user").userData;
@@ -21,10 +22,42 @@ const Form = () => {
   const [assignedDepartment, setAssignedDepartment] = useState("");
   const [assignedUser, setAssignedUser] = useState("");
   const [message, setMessage] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  let assignedToUserId, selectedIndex;
+  let assignedToUserId;
 
   const dispatch = useDispatch();
+
+  const manager = useMemo(
+    () =>
+      new Manager("ws://localhost:5000", {
+        path: "/notification/sockets",
+        transports: ["websocket"],
+      }),
+    []
+  );
+
+  const socket = manager.socket("/");
+
+  useEffect(() => {
+    socket.emit("initialize", {
+      email: userData.email,
+    });
+
+    socket.on("requestSent", (data) => {
+      alert(data.message);
+    });
+
+    socket.on("requestApprovedSuccessfully", (data) => {
+      // console.log("data", data);
+      alert(data.message);
+    });
+
+    socket.on("requestRejectedSuccessfully", (data) => {
+      // console.log("data", data);
+      alert(data.message);
+    });
+  }, []);
 
   let otherDepartments = useSelector(
     (state) => state.applications.otherDepartments
@@ -44,7 +77,7 @@ const Form = () => {
   };
 
   const handleChangeAssignedUser = (e) => {
-    selectedIndex = e.target.options.selectedIndex;
+    setSelectedIndex(e.target.options.selectedIndex);
     setAssignedUser(e.target.value);
   };
 
@@ -53,12 +86,13 @@ const Form = () => {
       alert("Please fill all the fields");
       return;
     }
-    const assignedToUserEmail = departmentUsers.find(
-      (user) => user.id === assignedToUserId
-    ).email;
 
     assignedToUserId =
       departmentUsers[selectedIndex] && departmentUsers[selectedIndex]._id;
+
+    const assignedToUserEmail = departmentUsers.find(
+      (user) => user._id === assignedToUserId
+    ).email;
 
     const payload = {
       assignedToUserId: assignedToUserId || departmentUsers[0]._id,
@@ -73,6 +107,12 @@ const Form = () => {
       message,
       status: "Pending",
     };
+
+    socket.emit("sendRequest", {
+      email: assignedToUserEmail,
+      type: "add",
+      payload: payload,
+    });
 
     dispatch(addApplication(payload));
   };

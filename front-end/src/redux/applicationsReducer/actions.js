@@ -187,7 +187,6 @@ export const updateApplicationStatus = (payload) => async (
 
   try {
     const response = await axios(config);
-
     const { applications } = getState();
     const { applications: applicationsList } = applications;
 
