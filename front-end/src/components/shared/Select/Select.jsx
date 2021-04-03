@@ -6,9 +6,16 @@ const Select = ({ header, options, onChange }) => {
     <>
       <Header>{header}</Header>
       <StyledSelect onChange={onChange}>
-        {options.map((option) => (
-          <option key={option}>{option}</option>
-        ))}
+        {typeof options[0] === "string" && (
+          <option key={""} value={""}></option>
+        )}
+        {options.map((option) => {
+          if (typeof option === "object") {
+            return <option key={option._id}>{option.name}</option>;
+          } else {
+            return <option key={option}>{option}</option>;
+          }
+        })}
       </StyledSelect>
     </>
   );

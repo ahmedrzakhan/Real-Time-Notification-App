@@ -45,14 +45,17 @@ const TabsContainer = styled.div`
 `;
 
 const TabRowWrapper = styled.div`
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  background: ${theme.secondary};
   display: flex;
   justify-content: center;
   width: 100vw;
+  position: sticky;
+  top: 0;
 `;
 
 const TabRow = styled.div`
   display: flex;
+  padding: 0.5rem 0;
 `;
 
 const Tab = styled.div`
@@ -67,5 +70,5 @@ const Tab = styled.div`
 
 const TabContent = styled.div`
   flex: 1;
-  margin-top: 2rem;
+  margin-top: 3rem;
 `;

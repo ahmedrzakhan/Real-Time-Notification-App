@@ -7,7 +7,9 @@ const addApplication = async (req, res) => {
     assignedToUserName,
     assignedToUserEmail,
     assignedDepartment,
-    createdBy,
+    createdByUserId,
+    createdByUserName,
+    createdByUserEmail,
     createdDate,
     department,
     message,
@@ -15,11 +17,13 @@ const addApplication = async (req, res) => {
   } = req.body;
 
   const application = new Application({
-    assignedDepartment,
     assignedToUserId,
     assignedToUserName,
     assignedToUserEmail,
-    createdBy,
+    assignedDepartment,
+    createdByUserId,
+    createdByUserName,
+    createdByUserEmail,
     createdDate,
     department,
     message,
@@ -35,21 +39,43 @@ const addApplication = async (req, res) => {
 };
 
 const getApplications = async (req, res) => {
-  const { createdBy, assignedDepartment, status } = req.query;
+  const {
+    createdByUserId,
+    assignedDepartment,
+    assignedToUserId,
+    status,
+  } = req.query;
 
-  if (assignedDepartment) {
-    const applications = await Application.find({
+  if (assignedDepartment && assignedToUserId) {
+    const assignedApplications = await Application.find({
+      assignedDepartment: assignedDepartment,
+      assignedToUserId: assignedToUserId,
+    });
+
+    const departmentApplications = await Application.find({
       assignedDepartment: assignedDepartment,
       status: { $ne: "Approved" },
     });
-    return res.send(applications);
+
+    const applications = [...assignedApplications, ...departmentApplications];
+
+    const filteredApplications = Array.from(
+      new Set(applications.map((a) => a.id))
+    ).map((id) => applications.find((a) => a.id === id));
+
+    return res.send(filteredApplications);
   } else {
     const applications = await Application.find(
       {
-        createdBy: createdBy,
+        createdByUserId: createdByUserId,
         status: status,
       },
-      { createdBy: 0 }
+      {
+        assignedToUserId: 0,
+        createdByUserEmail: 0,
+        createdByUserId: 0,
+        createdByUserName: 0,
+      }
     ).limit(5);
     return res.send(applications);
   }
@@ -58,10 +84,9 @@ const getApplications = async (req, res) => {
 const getOtherDepartments = async (req, res) => {
   const { department } = req.query;
 
-  const departments = await User.find(
-    { department: { $ne: department } },
-    { department: 1 }
-  );
+  let departments = await User.distinct("department");
+
+  departments = departments.filter((dept) => dept !== department);
 
   res.send(departments);
 };
@@ -79,8 +104,9 @@ const getDepartmentUsers = async (req, res) => {
 
 const updateApplicationStatus = async (req, res) => {
   const {
-    assignedTo,
-    createdBy,
+    assignedToUserName,
+    assignedToUserEmail,
+    assignedDepartment,
     createdDate,
     department,
     _id,
@@ -90,8 +116,9 @@ const updateApplicationStatus = async (req, res) => {
 
   Application.findById(_id)
     .then((application) => {
-      (application.assignedTo = assignedTo),
-        (application.createdBy = createdBy),
+      (application.assignedToUserName = assignedToUserName),
+        (application.assignedToUserEmail = assignedToUserEmail),
+        (application.assignedDepartment = assignedDepartment),
         (application.createdDate = createdDate),
         (application.department = department),
         (application.message = message),

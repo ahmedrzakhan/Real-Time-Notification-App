@@ -16,7 +16,6 @@ const FormContainer = ({ children, header }) => {
 export default FormContainer;
 
 const FormWrapper = styled.div`
-  align-items: center;
   display: flex;
   top: 20%;
   position: absolute;

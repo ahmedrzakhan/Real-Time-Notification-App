@@ -6,6 +6,7 @@ import styled from "styled-components";
 import FormContainer from "./../components/shared/FormContainer/FormContainer";
 import Input from "./../components/shared/Input/Input";
 import Button from "./../components/shared/Button/Button";
+import { theme } from "./../theme/theme";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -26,6 +27,7 @@ const Login = () => {
     <FormContainer header={"Welcome Back!"}>
       <LoginContainer>
         <Input
+          autoFocus
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
           value={email}
@@ -38,6 +40,10 @@ const Login = () => {
         />
         <Button onClick={handleLogin}>Log In</Button>
       </LoginContainer>
+      <RouteToContainer>
+        Need an Account
+        <AuthButton onClick={() => history.push("/signup")}>Signup</AuthButton>
+      </RouteToContainer>
     </FormContainer>
   );
 };
@@ -47,4 +53,19 @@ export default Login;
 const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+export const RouteToContainer = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+`;
+
+export const AuthButton = styled.button`
+  border: none;
+  color: ${theme.primary};
+  cursor: pointer;
+  background: ${theme.secondary};
+  font-size: 1rem;
 `;

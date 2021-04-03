@@ -1,5 +1,6 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
+import styled from "styled-components";
 import Navbar from "./../components/Navbar/Navbar";
 import Tabs from "./../components/shared/Tabs/Tabs";
 import Form from "./../components/Dashboard/Form";
@@ -18,19 +19,30 @@ const Dashboard = () => {
 
   return (
     <div>
-        <Navbar />
+      <Navbar />
       <Tabs
         tabComponents={[
           <Form />,
           <Pending />,
           <Approved />,
           <RequestForApproval />,
-          <Rejected />
+          <Rejected />,
         ]}
-        tabTitles={["Form", "Pending", "Approved", "Request(For Approval)", "Rejected"]}
+        tabTitles={[
+          "Form",
+          "Pending",
+          "Approved",
+          "Request(For Approval)",
+          "Rejected",
+        ]}
       />
     </div>
   );
 };
 
 export default Dashboard;
+
+export const NoApplicationsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;

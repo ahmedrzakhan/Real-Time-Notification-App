@@ -70,12 +70,12 @@ export const getApplicationsFailure = (payload) => ({
 export const getApplications = (payload) => async (dispatch) => {
   dispatch(getApplicationsRequest(payload));
 
-  const { assignedDepartment, createdBy, status } = payload;
+  const { assignedDepartment, assignedToUserId, createdByUserId, status } = payload;
   let queryParams;
   if (assignedDepartment) {
-    queryParams = `assignedDepartment=${assignedDepartment}`;
+    queryParams = `assignedDepartment=${assignedDepartment}&assignedToUserId=${assignedToUserId}`;
   } else {
-    queryParams = `createdBy=${createdBy}&status=${status}`;
+    queryParams = `createdByUserId=${createdByUserId}&status=${status}`;
   }
 
   const config = {
@@ -109,15 +109,14 @@ export const getOtherDepartmentsFailure = (payload) => ({
 export const getOtherDepartments = (payload) => async (dispatch) => {
   getOtherDepartmentsRequest(payload);
 
-  const { department } = payload;
   const config = {
     method: "get",
-    url: `http://localhost:5000/api/application/get-other-departments?department=${department}`,
+    url: `http://localhost:5000/api/application/get-other-departments?department=${payload}`,
   };
 
   try {
     const response = await axios(config);
-    dispatch(getOtherDepartmentsSuccess(response.payload));
+    dispatch(getOtherDepartmentsSuccess(response.data));
   } catch (err) {
     dispatch(getOtherDepartmentsFailure(payload));
   }
@@ -150,7 +149,7 @@ export const getDepartmentUsers = (payload) => async (dispatch) => {
 
   try {
     const response = await axios(config);
-    dispatch(getDepartmentUsersSuccess(response.payload));
+    dispatch(getDepartmentUsersSuccess(response.data));
   } catch (err) {
     dispatch(getDepartmentUsersFailure(payload));
   }
@@ -171,8 +170,11 @@ export const updateApplicationStatusFailure = (payload) => ({
   payload,
 });
 
-export const updateApplicationStatus = (payload) => async (dispatch) => {
-  updateApplicationStatusRequest(payload);
+export const updateApplicationStatus = (payload) => async (
+  dispatch,
+  getState
+) => {
+  dispatch(updateApplicationStatusRequest(payload));
 
   const config = {
     method: "post",
@@ -185,7 +187,16 @@ export const updateApplicationStatus = (payload) => async (dispatch) => {
 
   try {
     const response = await axios(config);
-    dispatch(updateApplicationStatusSuccess(response.payload));
+
+    const { applications } = getState();
+    const { applications: applicationsList } = applications;
+
+    const newApplications = applicationsList.map((application) =>
+      application._id === payload._id ? response.data : application
+    );
+
+    dispatch(updateApplicationStatusSuccess(newApplications));
+
   } catch (err) {
     dispatch(updateApplicationStatusFailure(payload));
   }

@@ -9,6 +9,7 @@ const Routes = () => {
     <Switch>
       <Route path="/" exact render={() => <Login />} />
       <Route path="/signup" render={() => <Signup />} />
+      <Route path="/dashboard" render={() => <Dashboard />} />
       <Route path="*" render={() => <Dashboard />} />
     </Switch>
   );

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { getDepartments, registerUser } from "./../redux/authReducer/actions";
+import { AuthButton, RouteToContainer } from "./Login";
 import FormContainer from "./../components/shared/FormContainer/FormContainer";
 import Input from "./../components/shared/Input/Input";
 import Select from "./../components/shared/Select/Select";
@@ -42,6 +43,7 @@ const Signup = () => {
     <FormContainer header={"Welcome"}>
       <SignupContainer>
         <Input
+          autoFocus
           onChange={(e) => setName(e.target.value)}
           placeholder="Name"
           value={name}
@@ -64,6 +66,10 @@ const Signup = () => {
           onChange={(e) => setDepartment(e.target.value)}
         />
         <Button onClick={handleSignup}>Signup</Button>
+        <RouteToContainer>
+          Already have an account
+          <AuthButton onClick={() => history.push("/")}>Login</AuthButton>
+        </RouteToContainer>
       </SignupContainer>
     </FormContainer>
   );

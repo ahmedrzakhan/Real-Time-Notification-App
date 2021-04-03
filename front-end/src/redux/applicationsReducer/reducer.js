@@ -8,6 +8,9 @@ import {
   GET_OTHER_DEPARTMENTS_REQUEST,
   GET_OTHER_DEPARTMENTS_SUCCESS,
   GET_OTHER_DEPARTMENTS_FAILURE,
+  GET_DEPARTMENT_USERS_REQUEST,
+  GET_DEPARTMENT_USERS_SUCCESS,
+  GET_DEPARTMENT_USERS_FAILURE,
   UPDATE_APPLICATION_STATUS_REQUEST,
   UPDATE_APPLICATION_STATUS_SUCCESS,
   UPDATE_APPLICATION_STATUS_FAILURE,
@@ -19,6 +22,8 @@ const initialState = {
   applications: [],
   isApplicationUpdating: false,
   otherDepartments: [],
+  areDepartmentUsersLoading: false,
+  departmentUsers: [],
 };
 
 export const applicationsReducer = (
@@ -65,6 +70,26 @@ export const applicationsReducer = (
       return { ...state };
     }
 
+    case GET_DEPARTMENT_USERS_REQUEST: {
+      return { ...state, areDepartmentUsersLoading: true };
+    }
+
+    case GET_DEPARTMENT_USERS_SUCCESS: {
+      return {
+        ...state,
+        areDepartmentUsersLoading: false,
+        departmentUsers: payload,
+      };
+    }
+
+    case GET_DEPARTMENT_USERS_FAILURE: {
+      return {
+        ...state,
+        areDepartmentUsersLoading: false,
+        departmentUsers: payload,
+      };
+    }
+
     case UPDATE_APPLICATION_STATUS_REQUEST: {
       return { ...state, isApplicationUpdating: true };
     }
@@ -72,7 +97,7 @@ export const applicationsReducer = (
     case UPDATE_APPLICATION_STATUS_SUCCESS: {
       return {
         ...state,
-        applications: [...state.applications, payload],
+        applications: payload,
         isApplicationUpdating: false,
       };
     }

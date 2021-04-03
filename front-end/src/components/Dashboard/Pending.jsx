@@ -1,11 +1,29 @@
-import React from 'react'
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import RenderApplications from "./RenderApplications";
+import { NoApplicationsContainer } from "./../../pages/Dashboard";
+import { getApplications } from "./../../redux/applicationsReducer/actions";
+import { loadData } from "./../../redux/store";
 
 const Pending = () => {
-    return (
-        <div>
-            Pending
-        </div>
-    )
-}
+  const dispatch = useDispatch();
+  const applications = useSelector((state) => state.applications.applications);
 
-export default Pending
+  useEffect(() => {
+    const payload = {
+      createdByUserId: loadData("user").userData._id,
+      status: "Pending",
+    };
+    dispatch(getApplications(payload));
+  }, [dispatch]);
+
+  if (!applications.length) {
+    return (
+      <NoApplicationsContainer>No Pending applications</NoApplicationsContainer>
+    );
+  }
+
+  return <RenderApplications applications={applications} />;
+};
+
+export default Pending;

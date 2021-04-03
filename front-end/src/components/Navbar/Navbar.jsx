@@ -1,13 +1,20 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { theme } from "./../../theme/theme";
 
 const Navbar = () => {
+  const history = useHistory();
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    history.push("/");
+  };
+
   return (
     <NavbarContainer>
       <Title>Home</Title>
       <LogoutContainer>
-        <LogoutButton>Logout</LogoutButton>
+        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       </LogoutContainer>
     </NavbarContainer>
   );
@@ -24,8 +31,6 @@ const NavbarContainer = styled.div`
   align-items: center;
 `;
 
-const NavbarWrapper = styled.div``;
-
 const Title = styled.div`
   font-weight: 700;
 `;
@@ -36,6 +41,7 @@ const LogoutButton = styled.button`
   background: ${theme.primary};
   border-radius: 0.25rem;
   color: ${theme.secondary};
+  cursor: pointer;
   font-weight: 700;
   padding: 0.5rem 1rem;
   border: 0;
